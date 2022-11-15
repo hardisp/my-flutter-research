@@ -16,7 +16,6 @@ class _ScreenTinderSwipeDraggableScrollableSheetState
   bool isDragged = false;
   @override
   Widget build(BuildContext context) {
-    inspect(isDragged);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tinder Swipe Scrollable'),
@@ -55,27 +54,32 @@ class _ScreenTinderSwipeDraggableScrollableSheetState
             minChildSize: 0.175,
             builder: (BuildContext context, ScrollController scrollController) {
               if (scrollController.hasClients) {
-                inspect(scrollController.offset);
-                if (scrollController.offset > 0) {
-                  inspect('inArea');
-
-                  Future.delayed(Duration.zero, () {
+                scrollController.removeListener(() {
+                  inspect(scrollController.position);
+                });
+                scrollController.addListener(() {
+                  double currentScroll = scrollController.position.pixels;
+                  if (scrollController.position.outOfRange) {
+                    inspect('object');
+                  }
+                  if (currentScroll > 0) {
                     if (!isDragged) {
-                      setState(() {
-                        isDragged = true;
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          isDragged = true;
+                        });
                       });
                     }
-                  });
-                } else {
-                  inspect('over');
-                  Future.delayed(Duration.zero, () {
+                  } else {
                     if (isDragged) {
-                      setState(() {
-                        isDragged = false;
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          isDragged = false;
+                        });
                       });
                     }
-                  });
-                }
+                  }
+                });
               }
 
               return Container(
